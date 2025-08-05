@@ -4,7 +4,23 @@ const urlSchema = new mongoose.Schema({
   originalUrl: { type: String, required: true },
   shortCode: { type: String, required: true, unique: true },
   clickCount: { type: Number, default: 0 },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+
+  // 🔹 Click-level tracking
+  clicks: [
+    {
+      ip: String,
+      timestamp: { type: Date, default: Date.now },
+    },
+  ],
+
+  // 🔹 Optional: Associate URLs with user (for history, dashboard, etc.)
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,
+  },
 });
 
 module.exports = mongoose.model('Url', urlSchema);
+
