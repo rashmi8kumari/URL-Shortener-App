@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { getToken } from "../utils/auth"; // utility to fetch token
 
 function Home() {
   const [longUrl, setLongUrl] = useState("");
@@ -7,7 +8,6 @@ function Home() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    //Load from localStorage on page load
     const savedUrl = localStorage.getItem("shortUrl");
     if (savedUrl) setShortUrl(savedUrl);
   }, []);
@@ -18,10 +18,15 @@ function Home() {
     setError("");
     setShortUrl("");
 
+    const token = getToken(); // Get token from localStorage
+
     try {
       const res = await fetch("http://localhost:5000/shorten", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // attach token here
+        },
         body: JSON.stringify({ originalUrl: longUrl }),
       });
 
@@ -30,7 +35,8 @@ function Home() {
       if (!res.ok) throw new Error(data.error || "Something went wrong");
 
       setShortUrl(data.shortUrl);
-      localStorage.setItem('shortUrl', data.shortUrl); // Save to localStorage
+      localStorage.setItem("shortUrl", data.shortUrl);
+      localStorage.setItem("lastCode", data.shortUrl.split("/").pop()); // extract short code for stats page
     } catch (err) {
       setError(err.message);
     } finally {
@@ -88,3 +94,4 @@ const styles = {
 };
 
 export default Home;
+
