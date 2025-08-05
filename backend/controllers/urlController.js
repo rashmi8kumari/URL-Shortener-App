@@ -32,15 +32,21 @@ const getStats = async (req, res) => {
   const { code } = req.params;
   try {
     const url = await Url.findOne({ shortCode: code });
-    if (!url) return res.status(404).json({ error: 'URL not found' });
+    if (!url) {return res.status(404).json({ error: 'URL not found' });}
+
+
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+    const shortUrl = `${baseUrl}/${url.shortCode}`;
+
 
     res.json({
       originalUrl: url.originalUrl,
-      shortCode: url.shortCode,
+      shortUrl: shortUrl,
       clickCount: url.clickCount,
       createdAt: url.createdAt
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 };
