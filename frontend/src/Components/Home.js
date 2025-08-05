@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getToken } from "../utils/auth"; // utility to fetch token
+import { getToken } from "../utils/auth";
 
 function Home() {
   const [longUrl, setLongUrl] = useState("");
@@ -18,14 +18,14 @@ function Home() {
     setError("");
     setShortUrl("");
 
-    const token = getToken(); // Get token from localStorage
+    const token = getToken();
 
     try {
       const res = await fetch("http://localhost:5000/shorten", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // attach token here
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ originalUrl: longUrl }),
       });
@@ -36,7 +36,7 @@ function Home() {
 
       setShortUrl(data.shortUrl);
       localStorage.setItem("shortUrl", data.shortUrl);
-      localStorage.setItem("lastCode", data.shortUrl.split("/").pop()); // extract short code for stats page
+      localStorage.setItem("lastCode", data.shortUrl.split("/").pop());
     } catch (err) {
       setError(err.message);
     } finally {
@@ -45,53 +45,52 @@ function Home() {
   };
 
   return (
-    <div style={styles.container}>
-      <h1>🔗 URL Shortener</h1>
-      <form onSubmit={handleShorten} style={styles.form}>
-        <input
-          type="text"
-          value={longUrl}
-          onChange={(e) => setLongUrl(e.target.value)}
-          placeholder="Enter your long URL"
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? "Shortening..." : "Shorten"}
-        </button>
-      </form>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-8 col-lg-6">
+          <div className="card shadow p-4">
+            <h3 className="text-center mb-4">🔗 URL Shortener</h3>
+            <form onSubmit={handleShorten}>
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Enter your long URL"
+                  value={longUrl}
+                  onChange={(e) => setLongUrl(e.target.value)}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn btn-success w-100"
+                disabled={loading}
+              >
+                {loading ? "Shortening..." : "Shorten URL"}
+              </button>
+            </form>
 
-      {error && <p style={styles.error}>{error}</p>}
-      {shortUrl && (
-        <p style={styles.result}>
-          Short URL:{" "}
-          <a href={shortUrl} target="_blank" rel="noreferrer">
-            {shortUrl}
-          </a>
-        </p>
-      )}
+            {error && (
+              <div className="alert alert-danger mt-3" role="alert">
+                {error}
+              </div>
+            )}
+
+            {shortUrl && (
+              <div className="alert alert-primary mt-4 text-center">
+                <strong>Short URL:</strong>{" "}
+                <a href={shortUrl} target="_blank" rel="noreferrer">
+                  {shortUrl}
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-const styles = {
-  container: {
-    maxWidth: "600px",
-    margin: "0 auto",
-    paddingTop: "50px",
-    textAlign: "center",
-  },
-  form: { display: "flex", flexDirection: "column", gap: "1rem" },
-  input: { padding: "10px", fontSize: "16px" },
-  button: {
-    padding: "10px",
-    fontSize: "16px",
-    backgroundColor: "#4CAF50",
-    color: "white",
-    border: "none",
-  },
-  error: { color: "red", marginTop: "10px" },
-  result: { marginTop: "20px", fontSize: "18px" },
-};
-
 export default Home;
+
 

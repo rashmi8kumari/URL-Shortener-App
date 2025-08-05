@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 
 function Stats() {
   const [code, setCode] = useState(localStorage.getItem('lastCode') || '');
@@ -20,9 +20,10 @@ function Stats() {
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error || "Something went wrong");
+
       setStats(data);
-      localStorage.setItem('lastCode', code); // save code
-      localStorage.setItem('statsData', JSON.stringify(data)); // save stats
+      localStorage.setItem('lastCode', code);
+      localStorage.setItem('statsData', JSON.stringify(data));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -31,65 +32,51 @@ function Stats() {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>📊 URL Stats</h2>
-      <form onSubmit={fetchStats} style={styles.form}>
-        <input
-          type="text"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Enter short code (e.g. abc123)"
-          style={styles.input}
-        />
-        <button type="submit" style={styles.button} disabled={loading}>
-          {loading ? "Loading..." : "Get Stats"}
-        </button>
-      </form>
+    <div className="container mt-5">
+      <div className="row justify-content-center">
+        <div className="col-md-8 col-lg-6">
+          <div className="card p-4 shadow">
+            <h3 className="text-center mb-4">📊 URL Statistics</h3>
 
-      {error && <p style={styles.error}>{error}</p>}
+            <form onSubmit={fetchStats}>
+              <div className="mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Enter short code (e.g. abc123)"
+                />
+              </div>
+              <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                {loading ? "Loading..." : "Get Stats"}
+              </button>
+            </form>
 
-      {stats && (
-        <div style={styles.stats}>
-          <p>
-            <strong>Original URL:</strong> {stats.originalUrl}
-          </p>
-          <p>
-            <strong>Short URL:</strong>{" "}
-            <a href={stats.shortUrl} target="_blank" rel="noreferrer">
-              {stats.shortUrl}
-            </a>
-          </p>
-          <p>
-            <strong>Click Count:</strong> {stats.clickCount}
-          </p>
-          <p>
-            <strong>Created At:</strong>{" "}
-            {new Date(stats.createdAt).toLocaleString()}
-          </p>
+            {error && (
+              <div className="alert alert-danger mt-3" role="alert">
+                {error}
+              </div>
+            )}
+
+            {stats && (
+              <div className="mt-4">
+                <h5 className="text-success">🔍 Stats Found:</h5>
+                <p><strong>Original URL:</strong> {stats.originalUrl}</p>
+                <p><strong>Short URL:</strong>{" "}
+                  <a href={stats.shortUrl} target="_blank" rel="noreferrer">
+                    {stats.shortUrl}
+                  </a>
+                </p>
+                <p><strong>Click Count:</strong> {stats.clickCount}</p>
+                <p><strong>Created At:</strong> {new Date(stats.createdAt).toLocaleString()}</p>
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: "600px",
-    margin: "0 auto",
-    paddingTop: "50px",
-    textAlign: "center",
-  },
-  form: { display: "flex", flexDirection: "column", gap: "1rem" },
-  input: { padding: "10px", fontSize: "16px" },
-  button: {
-    padding: "10px",
-    fontSize: "16px",
-    backgroundColor: "#2196F3",
-    color: "white",
-    border: "none",
-  },
-  error: { color: "red", marginTop: "10px" },
-  stats: { marginTop: "20px", textAlign: "left" },
-};
 
 export default Stats;
